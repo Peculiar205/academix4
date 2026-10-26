@@ -1,0 +1,20 @@
+{
+    "name": "academixsuite/platform",
+    "description": "AcademiX Suite – multi-tenant school management platform",
+    "type": "project",
+    "require": {
+        "php": ">=8.0",
+        "mpdf/mpdf": "^8.2",
+        "setasign/fpdi": "^2.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "AcademiX\\": "src/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist"
+    },
+    "minimum-stability": "stable"
+}

@@ -1,0 +1,137 @@
+RewriteEngine On
+RewriteBase /
+
+# -----------------------------------------------------------------------------
+# 0. HARD BLOCKS — evaluated before any rewrites so these requests can never be
+#    served, regardless of routing.
+# -----------------------------------------------------------------------------
+
+# Force HTTPS in production (Apache won't redirect on localhost because
+# HTTPS=on isn't set there, so XAMPP dev still works on http://).
+RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP_HOST} !^localhost [NC]
+RewriteCond %{HTTP_HOST} !^127\.0\.0\.1 [NC]
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Deny any direct request for SQL dumps, env files, backups, vcs dirs.
+RewriteRule \.(sql|sqlite|db|bak|backup|swp|swo|log|ini|env|lock|orig|old|tmp)$ - [F,L,NC]
+RewriteRule (^|/)\.(git|svn|hg|vscode|idea|DS_Store) - [F,L,NC]
+
+# Deny known dev / one-off maintenance scripts that must never be public.
+RewriteRule ^(reupload|create_test_schools|diagnose_email_queue|fix_email_queue_table|cron|Onboard_form|cv|indexx|filestructure|empty)(\.php|\.html)?$ - [F,L,NC]
+
+# Deny log, backup, vendor, and database-dump directories outright.
+RewriteRule ^(logs|backups|database|vendor|tests)(/|$) - [F,L]
+
+# Block PHP execution from inside upload directories. This stays in RewriteRule
+# form because cPanel/shared-host .htaccess files cannot use DirectoryMatch.
+RewriteRule ^(assets/uploads|uploads|tenant/[^/]+/uploads)/.*\.(ph(p[3457]?|t|ar|tml)|inc)$ - [F,L,NC]
+
+# -----------------------------------------------------------------------------
+# 1. ROUTE WILDCARD SCHOOL SUBDOMAINS
+#    demo.academixsuite.com/admin/dashboard.php -> tenant/router.php?school_slug=demo
+# -----------------------------------------------------------------------------
+RewriteCond %{HTTP_HOST} ^([a-z0-9-]+)\.academixsuite\.com$ [NC]
+RewriteCond %1 !^(www|app|admin|platform|api|mail|webmail|cpanel|whm|ftp|autodiscover)$ [NC]
+RewriteRule ^assets/uploads/(.*)$ - [L]
+
+RewriteCond %{HTTP_HOST} ^([a-z0-9-]+)\.academixsuite\.com$ [NC]
+RewriteCond %1 !^(www|app|admin|platform|api|mail|webmail|cpanel|whm|ftp|autodiscover)$ [NC]
+RewriteRule ^assets/(.*)$ tenant/assets/$1 [L,QSA]
+
+RewriteCond %{HTTP_HOST} ^([a-z0-9-]+)\.academixsuite\.com$ [NC]
+RewriteCond %1 !^(www|app|admin|platform|api|mail|webmail|cpanel|whm|ftp|autodiscover)$ [NC]
+RewriteRule ^(admin|admin2|teacher|student|parent|staff)/assets/(.*)$ tenant/assets/$2 [L,QSA]
+
+RewriteCond %{HTTP_HOST} ^([a-z0-9-]+)\.academixsuite\.com$ [NC]
+RewriteCond %1 !^(www|app|admin|platform|api|mail|webmail|cpanel|whm|ftp|autodiscover)$ [NC]
+RewriteRule ^(login|logout)(\.php)?/?$ tenant/$1.php?school_slug=%1 [L,QSA]
+
+RewriteCond %{HTTP_HOST} ^([a-z0-9-]+)\.academixsuite\.com$ [NC]
+RewriteCond %1 !^(www|app|admin|platform|api|mail|webmail|cpanel|whm|ftp|autodiscover)$ [NC]
+RewriteRule ^forgot-password(\.php)?/?$ tenant/forgot-password.php?school_slug=%1 [L,QSA]
+
+RewriteCond %{HTTP_HOST} ^([a-z0-9-]+)\.academixsuite\.com$ [NC]
+RewriteCond %1 !^(www|app|admin|platform|api|mail|webmail|cpanel|whm|ftp|autodiscover)$ [NC]
+RewriteRule ^api/(.*)$ tenant/api/$1?school_slug=%1 [L,QSA]
+
+RewriteCond %{HTTP_HOST} ^([a-z0-9-]+)\.academixsuite\.com$ [NC]
+RewriteCond %1 !^(www|app|admin|platform|api|mail|webmail|cpanel|whm|ftp|autodiscover)$ [NC]
+RewriteRule ^(admin|admin2|teacher|student|parent|staff)/?$ tenant/router.php?school_slug=%1&user_type=$1&page=dashboard.php [L,QSA]
+
+RewriteCond %{HTTP_HOST} ^([a-z0-9-]+)\.academixsuite\.com$ [NC]
+RewriteCond %1 !^(www|app|admin|platform|api|mail|webmail|cpanel|whm|ftp|autodiscover)$ [NC]
+RewriteRule ^(admin|admin2|teacher|student|parent|staff)/([a-zA-Z0-9_\-/]+\.(php|html|htm))$ tenant/router.php?school_slug=%1&user_type=$1&page=$2 [L,QSA]
+
+RewriteCond %{HTTP_HOST} ^([a-z0-9-]+)\.academixsuite\.com$ [NC]
+RewriteCond %1 !^(www|app|admin|platform|api|mail|webmail|cpanel|whm|ftp|autodiscover)$ [NC]
+RewriteRule ^(admin|admin2|teacher|student|parent|staff)/([a-zA-Z0-9_\-/]+)$ tenant/router.php?school_slug=%1&user_type=$1&page=$2.php [L,QSA]
+
+RewriteCond %{HTTP_HOST} ^([a-z0-9-]+)\.academixsuite\.com$ [NC]
+RewriteCond %1 !^(www|app|admin|platform|api|mail|webmail|cpanel|whm|ftp|autodiscover)$ [NC]
+RewriteRule ^$ tenant/school_profile.php?slug=%1 [L,QSA]
+
+RewriteCond %{HTTP_HOST} ^([a-z0-9-]+)\.academixsuite\.com$ [NC]
+RewriteCond %1 !^(www|app|admin|platform|api|mail|webmail|cpanel|whm|ftp|autodiscover)$ [NC]
+RewriteRule ^index\.php$ tenant/school_profile.php?slug=%1 [L,QSA]
+
+# -----------------------------------------------------------------------------
+# 2. ALLOW DIRECT ACCESS TO EXISTING FILES AND DIRECTORIES
+# -----------------------------------------------------------------------------
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# -----------------------------------------------------------------------------
+# 3. ROUTE /platform/* REQUESTS TO PLATFORM FRONT CONTROLLER
+# -----------------------------------------------------------------------------
+RewriteRule ^platform/(.*)$ platform/index.php?path=$1 [L,QSA]
+
+# -----------------------------------------------------------------------------
+# 4. ROUTE /login TO TENANT LOGIN
+# -----------------------------------------------------------------------------
+RewriteRule ^login/?$ tenant/login.php [L]
+
+# -----------------------------------------------------------------------------
+# 5. ROUTE /register and /request-demo
+# -----------------------------------------------------------------------------
+RewriteRule ^register/?$ public/register.php?tab=register [L,QSA]
+RewriteRule ^(request-demo|demo-request)/?$ public/register.php?tab=demo [L,QSA]
+
+# -----------------------------------------------------------------------------
+# 6. DEFAULT PUBLIC ROUTING
+# -----------------------------------------------------------------------------
+RewriteRule ^(.*)$ /public/$1 [L]
+
+# -----------------------------------------------------------------------------
+# Security headers
+# -----------------------------------------------------------------------------
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    # Do not enable includeSubDomains until the wildcard SSL certificate for
+    # *.academixsuite.com is installed and trusted for every school subdomain.
+    Header always set Strict-Transport-Security "max-age=300"
+</IfModule>
+
+<FilesMatch "\.(eot|otf|ttf|woff|woff2|svg)$">
+    <IfModule mod_headers.c>
+        Header set Access-Control-Allow-Origin "*"
+    </IfModule>
+</FilesMatch>
+
+# Set default index files
+DirectoryIndex index.php index.html index.htm
+
+# Disable directory listing. Avoid forcing FollowSymLinks here because many
+# shared cPanel hosts reject that option in user-level .htaccess files.
+Options -Indexes
+
+# Protect sensitive files by name as well (defence in depth — Apache may match
+# this earlier than the RewriteRule above on some hosts).
+<FilesMatch "^(\.htaccess|\.htpasswd|\.env(\..*)?|config\.php|composer\.(json|lock)|package(-lock)?\.json|\.gitignore|\.gitattributes|README\.md|.*\.(sql|sqlite|db|bak|backup|log|ini|orig|old|tmp|swp))$">
+    Require all denied
+</FilesMatch>

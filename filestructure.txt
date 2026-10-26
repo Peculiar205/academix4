@@ -1,0 +1,353 @@
+academixsuite/
+├── config/
+│   ├── database.php
+│   ├── constants.php
+│   ├── functions.php
+│   └── payment.php           # Payment gateway configurations
+│
+├── includes/
+│   ├── autoload.php
+│   ├── ErrorHandler.php
+│   ├── Database.php
+│   ├── Auth.php
+│   ├── Session.php
+│   ├── Utils.php
+│   ├── Tenant.php
+│   ├── SchoolSession.php
+│   ├── Payment/             # New: Payment handling classes
+│   │   ├── PaymentGateway.php
+│   │   ├── PaystackGateway.php
+│   │   ├── FlutterwaveGateway.php
+│   │   ├── StripeGateway.php
+│   │   ├── PaymentFactory.php
+│   │   ├── PaymentProcessor.php
+│   │   └── PaymentValidator.php
+│   ├── Gateway/            # New: Gateway-specific implementations
+│   │   ├── Paystack/
+│   │   │   ├── PaystackApi.php
+│   │   │   ├── PaystackWebhook.php
+│   │   │   └── PaystackHelper.php
+│   │   ├── Flutterwave/
+│   │   │   ├── FlutterwaveApi.php
+│   │   │   ├── FlutterwaveWebhook.php
+│   │   │   └── FlutterwaveHelper.php
+│   │   └── Stripe/
+│   │       ├── StripeApi.php
+│   │       ├── StripeWebhook.php
+│   │       └── StripeHelper.php
+│   ├── Services/          # New: Business logic services
+│   │   ├── PaymentService.php
+│   │   ├── InvoiceService.php
+│   │   ├── EnrollmentService.php
+│   │   ├── ParentPortalService.php
+│   │   └── NotificationService.php
+│   └── Helpers/
+│       ├── PaymentHelper.php
+│       ├── InvoiceHelper.php
+│       ├── PDFGenerator.php
+│       └── WebhookHelper.php
+│
+├── platform/
+│   ├── admin/
+│   │   ├── filepath/
+│   │   │   └── sidebar.php
+│   │   ├── index.php
+│   │   ├── dashboard.php
+│   │   │
+│   │   ├── schools/
+│   │   │   └── ...
+│   │   │
+│   │   ├── payments/           # NEW: Payment management
+│   │   │   ├── index.php       # Payment dashboard
+│   │   │   ├── gateways/       # Gateway management
+│   │   │   │   ├── index.php   # List gateways
+│   │   │   │   ├── add.php     # Add gateway
+│   │   │   │   ├── edit.php    # Edit gateway
+│   │   │   │   ├── test.php    # Test gateway
+│   │   │   │   └── webhooks.php # Webhook setup
+│   │   │   ├── transactions/   # Transaction management
+│   │   │   │   ├── index.php   # All transactions
+│   │   │   │   ├── view.php    # View transaction
+│   │   │   │   ├── refund.php  # Process refund
+│   │   │   │   └── search.php  # Search transactions
+│   │   │   ├── invoices/       # Invoice management
+│   │   │   │   ├── index.php   # All invoices
+│   │   │   │   ├── view.php    # View invoice
+│   │   │   │   ├── create.php  # Create invoice
+│   │   │   │   └── batch.php   # Batch invoice processing
+│   │   │   ├── reconciliation/ # Payment reconciliation
+│   │   │   │   ├── index.php   # Reconciliation dashboard
+│   │   │   │   ├── daily.php   # Daily reconciliation
+│   │   │   │   ├── monthly.php # Monthly reconciliation
+│   │   │   │   └── reports.php # Reconciliation reports
+│   │   │   └── settings/       # Payment settings
+│   │   │       ├── fees.php    # Fee configuration
+│   │   │       ├── tax.php     # Tax settings
+│   │   │       └── settlement.php # Settlement settings
+│   │   │
+│   │   ├── subscriptions/
+│   │   │   ├── index.php
+│   │   │   └── billing/        # NEW: Billing management
+│   │   │       ├── cycles.php  # Billing cycles
+│   │   │       ├── overdue.php # Overdue subscriptions
+│   │   │       └── reminders.php # Payment reminders
+│   │   │
+│   │   ├── onboarding/         # NEW: School onboarding
+│   │   │   ├── index.php       # Onboarding requests
+│   │   │   ├── review.php      # Review application
+│   │   │   ├── setup.php       # School setup wizard
+│   │   │   ├── payments.php    # Onboarding payments
+│   │   │   └── documents.php   # Document management
+│   │   │
+│   │   ├── reports/
+│   │   │   └── payments/       # NEW: Payment reports
+│   │   │       ├── revenue.php # Revenue analytics
+│   │   │       ├── gateway.php # Gateway performance
+│   │   │       └── parent.php  # Parent payment patterns
+│   │   │
+│   │   └── logs/
+│   │       └── payment-logs.php # NEW: Payment logs
+│   │
+│   └── webhooks/              # NEW: Webhook endpoints
+│       ├── paystack.php
+│       ├── flutterwave.php
+│       ├── stripe.php
+│       └── index.php          # Webhook verification
+│
+├── tenant/
+│   ├── {school-slug}/
+│   │   │
+│   │   ├── admin/
+│   │   │   ├── payments/      # NEW: School admin payments
+│   │   │   │   ├── index.php  # Payment dashboard
+│   │   │   │   ├── invoices/  # Invoice management
+│   │   │   │   │   ├── index.php
+│   │   │   │   │   ├── create.php
+│   │   │   │   │   ├── view.php
+│   │   │   │   │   └── send.php
+│   │   │   │   ├── collections/ # Fee collection
+│   │   │   │   │   ├── index.php
+│   │   │   │   │   ├── record.php
+│   │   │   │   │   └── offline.php
+│   │   │   │   ├── gateways/  # School payment gateways
+│   │   │   │   │   ├── index.php
+│   │   │   │   │   └── setup.php
+│   │   │   │   └── reports/   # School payment reports
+│   │   │   │       ├── collected.php
+│   │   │   │       ├── outstanding.php
+│   │   │   │       └── waivers.php
+│   │   │   ├── fees/          # NEW: Fee management
+│   │   │   │   ├── categories.php
+│   │   │   │   ├── structures.php
+│   │   │   │   ├── waivers.php
+│   │   │   │   └── discounts.php
+│   │   │   └── settings/
+│   │   │       ├── billing.php  # NEW: Billing settings
+│   │   │       └── payment.php  # NEW: Payment settings
+│   │   │
+│   │   ├── parent/
+│   │   │   ├── payments/      # NEW: Parent payment portal
+│   │   │   │   ├── index.php  # Payment dashboard
+│   │   │   │   ├── overview.php # Fee overview
+│   │   │   │   ├── invoices/  # Invoice viewing/payment
+│   │   │   │   │   ├── index.php
+│   │   │   │   │   ├── view.php
+│   │   │   │   │   └── pay.php
+│   │   │   │   ├── history/   # Payment history
+│   │   │   │   │   ├── index.php
+│   │   │   │   │   └── receipt.php
+│   │   │   │   ├── methods/   # Payment methods
+│   │   │   │   │   ├── index.php
+│   │   │   │   │   ├── add-card.php
+│   │   │   │   │   └── manage.php
+│   │   │   │   ├── batch/     # Batch payments
+│   │   │   │   │   ├── create.php
+│   │   │   │   │   └── confirm.php
+│   │   │   │   └── autopay/   # Auto-pay setup
+│   │   │   │       ├── setup.php
+│   │   │   │       └── manage.php
+│   │   │   ├── children/
+│   │   │   │   └── fees.php   # NEW: Child fee overview
+│   │   │   └── profile/
+│   │   │       └── billing.php # NEW: Billing profile
+│   │   │
+│   │   ├── student/
+│   │   │   └── fees/          # NEW: Student fee view
+│   │   │       ├── index.php
+│   │   │       └── history.php
+│   │   │
+│   │   ├── api/               # NEW: School-specific API
+│   │   │   ├── payment.php    # Payment API endpoints
+│   │   │   ├── invoice.php    # Invoice API
+│   │   │   └── webhook.php    # School webhooks
+│   │   │
+│   │   ├── assets/
+│   │   │   ├── css/
+│   │   │   │   └── payment.css # NEW: Payment styles
+│   │   │   └── js/
+│   │   │       ├── payment.js  # NEW: Payment scripts
+│   │   │       ├── invoice.js
+│   │   │       └── parent-portal.js
+│   │   │
+│   │   ├── payment/           # NEW: Payment processing
+│   │   │   ├── callback.php   # Payment callback
+│   │   │   ├── success.php    # Payment success
+│   │   │   ├── failed.php     # Payment failed
+│   │   │   ├── verify.php     # Payment verification
+│   │   │   └── webhook.php    # School webhook
+│   │   │
+│   │   ├── invoices/          # NEW: Invoice views
+│   │   │   ├── view.php       # View invoice
+│   │   │   ├── print.php      # Print invoice
+│   │   │   └── download.php   # Download invoice
+│   │   │
+│   │   ├── config.php
+│   │   ├── index.php
+│   │   ├── login.php
+│   │   └── register.php       # NEW: Parent/student registration
+│   │
+│   ├── shared/                # NEW: Shared tenant resources
+│   │   ├── payment-modules/   # Shared payment modules
+│   │   │   ├── PaymentTemplates.php
+│   │   │   ├── PaymentCalculator.php
+│   │   │   └── InvoiceGenerator.php
+│   │   └── parent-portal/     # Shared parent portal
+│   │       ├── ParentAuth.php
+│   │       ├── ChildManager.php
+│   │       └── FeeCalculator.php
+│   │
+│   └── login.php
+│
+├── public/
+│   ├── api/                   # NEW: Public API endpoints
+│   │   ├── v1/
+│   │   │   ├── payment/
+│   │   │   │   ├── initialize.php
+│   │   │   │   ├── verify.php
+│   │   │   │   ├── webhook.php
+│   │   │   │   └── callback.php
+│   │   │   ├── enrollment/
+│   │   │   │   ├── apply.php
+│   │   │   │   ├── status.php
+│   │   │   │   └── payment.php
+│   │   │   └── parent/
+│   │   │       ├── login.php
+│   │   │       ├── access.php
+│   │   │       └── fees.php
+│   │   └── webhooks/          # Public webhooks
+│   │       ├── paystack.php
+│   │       ├── flutterwave.php
+│   │       └── stripe.php
+│   │
+│   ├── payment-portal/        # NEW: Public payment portal
+│   │   ├── index.php          # Portal entry
+│   │   ├── login.php          # Portal login
+│   │   ├── invoice/           # Invoice access
+│   │   │   ├── view.php
+│   │   │   └── pay.php
+│   │   └── receipt/           # Receipt access
+│   │       ├── view.php
+│   │       └── download.php
+│   │
+│   ├── index.php
+│   ├── register.php
+│   ├── pricing.php
+│   ├── contact.php
+│   ├── school-register/       # NEW: School registration wizard
+│   │   ├── index.php          # Step 1: Basic info
+│   │   ├── details.php        # Step 2: School details
+│   │   ├── admin.php          # Step 3: Admin setup
+│   │   ├── payment.php        # Step 4: Payment
+│   │   ├── confirmation.php   # Step 5: Confirmation
+│   │   └── success.php        # Step 6: Success
+│   └── parent-access/         # NEW: Parent access request
+│       ├── request.php
+│       ├── verify.php
+│       └── setup.php
+│
+├── templates/
+│   ├── emails/                # NEW: Email templates
+│   │   ├── payment/
+│   │   │   ├── invoice.html
+│   │   │   ├── receipt.html
+│   │   │   ├── reminder.html
+│   │   │   └── confirmation.html
+│   │   ├── enrollment/
+│   │   │   ├── application.html
+│   │   │   ├── accepted.html
+│   │   │   └── payment-required.html
+│   │   └── parent/
+│   │       ├── welcome.html
+│   │       ├── access-granted.html
+│   │       └── fee-alert.html
+│   │
+│   ├── payment/               # NEW: Payment templates
+│   │   ├── invoice-template.php
+│   │   ├── receipt-template.php
+│   │   ├── payment-form.php
+│   │   └── gateway-selector.php
+│   │
+│   ├── portal/                # NEW: Portal templates
+│   │   ├── parent-dashboard.php
+│   │   ├── fee-overview.php
+│   │   ├── payment-history.php
+│   │   └── invoice-list.php
+│   │
+│   ├── header.php
+│   ├── footer.php
+│   ├── sidebar-admin.php
+│   ├── sidebar-teacher.php
+│   └── sidebar-parent.php     # NEW: Parent sidebar
+│
+├── assets/uploads/
+│   ├── platform/
+│   ├── schools/
+│   ├── temp/
+│   └── invoices/              # NEW: Invoice storage
+│       ├── pdf/               # Generated PDFs
+│       ├── receipts/          # Receipts
+│       └── proofs/            # Payment proofs
+│
+├── vendor/
+│
+├── database/
+│   ├── migrations/           # NEW: Database migrations
+│   │   ├── 001_create_payment_tables.php
+│   │   ├── 002_create_gateway_tables.php
+│   │   ├── 003_create_invoice_tables.php
+│   │   ├── 004_create_parent_portal_tables.php
+│   │   └── 005_add_payment_columns.php
+│   ├── seeds/               # NEW: Seed data
+│   │   ├── PaymentGatewaysSeeder.php
+│   │   ├── PaymentPlansSeeder.php
+│   │   └── FeeCategoriesSeeder.php
+│   └── schemas/             # NEW: Database schemas
+│       ├── payment_schema.sql
+│       ├── gateway_schema.sql
+│       └── invoice_schema.sql
+│
+├── tests/                   # NEW: Test files
+│   ├── Unit/
+│   │   ├── PaymentGatewayTest.php
+│   │   └── InvoiceServiceTest.php
+│   ├── Integration/
+│   │   ├── PaymentIntegrationTest.php
+│   │   └── ParentPortalTest.php
+│   └── Fixtures/
+│       ├── PaymentFixtures.php
+│       └── InvoiceFixtures.php
+│
+├── logs/                    # NEW: Application logs
+│   ├── payments/
+│   │   ├── transactions.log
+│   │   ├── webhooks.log
+│   │   └── errors.log
+│   ├── enrollments/
+│   └── parent-portal/
+│
+├── .env.example             # NEW: Environment variables
+├── .htaccess
+├── index.php
+├── login.php
+├── composer.json
+└── README.md

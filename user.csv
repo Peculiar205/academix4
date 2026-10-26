@@ -1,0 +1,4 @@
+name,email,employee_id,phone,qualification,specialization,joining_date,gender
+Robert Johnson,robert.j@school.com,TCH-001,+1234567890,M.Ed,Mathematics,2023-09-01,male
+Sarah Williams,sarah.w@school.com,TCH-002,+0987654321,B.Ed,English,2023-09-01,female
+David Miller,david.m@school.com,TCH-003,+1122334455,M.Sc,Physics,2023-09-01,male
